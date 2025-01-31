@@ -1,0 +1,81 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+ 
+
+@keyframes rotate-tick {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes bolt-scale {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(5);
+  }
+}
+
+.animate-bolt-scale {
+  animation: bolt-scale 5s ease-in-out;
+}
+@keyframes rotate-animation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-rotate {
+  animation: rotate-animation 0.5s ease-in-out;
+}
+
+
+@keyframes rotate-twice {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(420deg); /* Two full rotations */
+  }
+}
+
+.animate-rotate-twice {
+  animation: rotate-twice 0.5s ease-in-out;
+}
+
+/* Update the keyframes */
+@keyframes shrink-expand {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(.08); /* This will shrink both horizontally and vertically */
+  }
+  100% {
+    transform: scale(1); /* Return to normal */
+  }
+}
+
+.animate-shrink-expand {
+  animation: shrink-expand 3s ease-in-out; /* Make sure this duration matches the timeout in JS */
+}
+
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.blink {
+  animation: blink 1s infinite;
+}
+
