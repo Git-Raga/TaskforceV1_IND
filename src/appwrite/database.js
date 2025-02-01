@@ -28,10 +28,8 @@ const db = {
         delete: (id) => databases.deleteDocument(import.meta.env.VITE_DATABASE_ID, '672f8386001eb724f220', id),
         list: (queries = []) =>
             databases.listDocuments(import.meta.env.VITE_DATABASE_ID, '672f8386001eb724f220', queries),
+
         get: (id) => databases.getDocument(import.meta.env.VITE_DATABASE_ID, '672f8386001eb724f220', id),
-        getUserStats: async (userEmail) => {
-            // Existing getUserStats implementation
-        }
     },
     todocollection: {
         create: (payload, id = ID.unique()) =>
@@ -51,7 +49,45 @@ const db = {
         delete: (id) => databases.deleteDocument(import.meta.env.VITE_DATABASE_ID, import.meta.env.VITE_COLLECTION_ID_TODOS, id),
         list: (queries = []) =>
             databases.listDocuments(import.meta.env.VITE_DATABASE_ID, import.meta.env.VITE_COLLECTION_ID_TODOS, queries),
-        get: (id) => databases.getDocument(import.meta.env.VITE_DATABASE_ID, import.meta.env.VITE_COLLECTION_ID_TODOS, id)
+        get: (id) => databases.getDocument(import.meta.env.VITE_DATABASE_ID, import.meta.env.VITE_COLLECTION_ID_TODOS, id),
+
+        getUserStats: async (userEmail) => {
+            try {
+                const userMappings = {
+                    "neha.adam@salesforce.com": { name: "Neha" },
+                    "archita.srivastava@salesforce.com": { name: "Architha" },
+                    "rmanjalavadde@salesforce.com": { name: "Raghav M" },
+                    "mdusad@salesforce.com": { name: "Muskan" },
+                    "mprathaban@salesforce.com": { name: "Mahima" },
+                    "suresh.k@salesforce.com": { name: "Suresh" },
+                    "bswetha@salesforce.com": { name: "Swetha" },
+                    "bhaskarreddy.m@salesforce.com": { name: "Bhaskar" },
+                    "dbommineni@salesforce.com": { name: "Dileep" },
+                    "marena@salesforce.com": { name: "Marena" },
+                    "abhishek.mohanty@salesforce.com": { name: "Abhishek" },
+                    "rkrishnamurthy1@salesforce.com": { name: "Raghav K" }
+                };
+         
+                const taskowner = userMappings[userEmail]?.name;
+                const response = await databases.listDocuments(
+                    import.meta.env.VITE_DATABASE_ID,
+                    import.meta.env.VITE_COLLECTION_ID_TODOS,
+                    [Query.equal('taskowner', taskowner)]
+                );
+         
+                const tasks = response.documents;
+                return {
+                    totalTasks: tasks.length,
+                    completedTasks: tasks.filter(task => task.completed).length,
+                    activeTasks: tasks.filter(task => !task.completed && task.duedate && new Date(task.duedate) >= new Date()).length,
+                    lateTasks: tasks.filter(task => !task.completed && task.duedate && new Date(task.duedate) < new Date()).length,
+                    perfectTasks: tasks.filter(task => task.completed && task.Perfectstar).length
+                };
+            } catch (error) {
+                console.error('Error:', error);
+                throw error;
+            }
+         }
     },
     supporttickets: {
         getTickets: async () => {
