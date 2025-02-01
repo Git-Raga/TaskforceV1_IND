@@ -86,7 +86,7 @@ function App() {
             } 
           />
         </Routes>
-        <Footer /> {/* Render the Footer component */}
+        
       </BrowserRouter>
     </AuthProvider>
   );
