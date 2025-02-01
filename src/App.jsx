@@ -6,7 +6,7 @@ import LoginPage from './pages/LoginPage';
 import UserNotes from './components/UserNotes';
 import Alluserstats from './components/Allusersstats';
 import SupportPage from './components/SupportPage'; // Import the SupportPage component
-import Footer from './components/Footer'; // Import the Footer component
+ 
 
 const ProtectedRoute = ({ children, requireAdmin }) => {
   const { isLoggedIn } = useContext(AuthContext);
