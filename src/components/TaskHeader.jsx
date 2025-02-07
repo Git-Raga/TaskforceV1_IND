@@ -1,6 +1,6 @@
 import React from "react";
 
-function TaskHeader({ theme }) {
+function TaskHeader({ theme, onDueDateClick, isSortingByDueDate }) {
   const themeTextColor =
     theme === "dark" || theme === "green" ? "text-white" : "text-gray-800";
   const headerBackground =
@@ -11,35 +11,63 @@ function TaskHeader({ theme }) {
       : "bg-white";
   const borderColor =
     theme === "dark" ? "border-gray-600" : "border-gray-300";
-  const dueDateBackground =
-    theme === "dark"
-      ? "bg-gray-800 text-orange-400"
-      : theme === "green"
-      ? "bg-teal-100 text-orange-600"
-      : "bg-orange-600 text-white";
+    
+  const getDueDateStyles = () => {
+    const baseStyles = "flex-none w-[89px] text-center flex items-center justify-center h-6 rounded-md mr-[22px] transition-all duration-200 cursor-pointer";
+    
+    if (isSortingByDueDate) {
+      // Active state styles based on theme
+      switch (theme) {
+        case "dark":
+          return `${baseStyles} bg-gray-700 text-orange-400 border-2 border-orange-400 shadow-lg`;
+        case "green":
+          return `${baseStyles} bg-teal-200 text-orange-600 border-2 border-orange-500 shadow-lg`;
+        default:
+          return `${baseStyles} bg-orange-700 text-white border-2 border-black shadow-lg`;
+      }
+    }
+    
+    // Inactive state styles based on theme
+    switch (theme) {
+      case "dark":
+        return `${baseStyles} bg-gray-800 text-orange-400 hover:bg-gray-700`;
+      case "green":
+        return `${baseStyles} bg-teal-100 text-orange-600 hover:bg-teal-200`;
+      default:
+        return `${baseStyles} bg-orange-600 text-white hover:bg-orange-700`;
+    }
+  };
 
   return (
     <div
-      className={`w-full whitespace-nowrap ${headerBackground} border-b ${borderColor} pt-1 `}
+      className={`w-full whitespace-nowrap ${headerBackground} border-b ${borderColor} pt-1`}
     >
       <div className={`flex items-center text-sm font-semibold ${themeTextColor}`}>
         {/* Urgency */}
         <span className="flex-none w-[100px] text-left ml-1 flex items-center">
-        Urgency ❗
+          Urgency ❗
+        </span>
+
+  {/* Task Details */}
+  <span className="flex-grow ml-16 flex items-center  ">
+  📄
         </span>
 
         {/* Task Details */}
-        <span className="flex-grow ml-16 flex items-center w-[150px]">
+        <span className="flex-grow mr-[580px] flex items-center w-[150px]">
           Task Details 📝
         </span>
 
-        {/* Due Date */}
-        <span className={`flex-none w-[89px] text-center flex items-center justify-center h-6 rounded-md mr-[22px] ${dueDateBackground}`}>
-        Due⏱️ Date
-        </span>
+        {/* Due Date - Now a clickable button */}
+        <button
+          onClick={onDueDateClick}
+          className={getDueDateStyles()}
+        >
+          Due⏱️ Date
+        </button>
 
         {/* Perfect */}
-        <span className="flex-none w-[100px] text-center mr-[-35px] flex items-center justify-center ">
+        <span className="flex-none w-[100px] text-center mr-[-35px] flex items-center justify-center">
           Perfect ⭐
         </span>
 

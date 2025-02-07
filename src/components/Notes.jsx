@@ -17,7 +17,6 @@ import SortTasks from "./SortTasks";
 import AdminSettingsModal from './AdminSettingsModal';
 import { useNavigate } from 'react-router-dom'
 
-
 const Notes = () => {
   const [notes, setNotes] = useState([]);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -31,13 +30,11 @@ const Notes = () => {
   const [loading, setLoading] = useState(true);
   const [selectedOwner, setSelectedOwner] = useState("");
   const [filteredCount, setFilteredCount] = useState(0);
+  const [sortByDueDate, setSortByDueDate] = useState(false);
   const isAdmin = localStorage.getItem('isAdmin') === 'true';
-     const [isAnimating, setIsAnimating] = useState(true);
-     const navigate = useNavigate();
-  // Near your other state declarations
-
+  const [isAnimating, setIsAnimating] = useState(true);
+  const navigate = useNavigate();
   const [activeTasks, setActiveTasks] = useState(0);
-
   const [filterOption, setFilterOption] = useState(() => {
     return localStorage.getItem("filterOption") || "All";
   });
@@ -59,12 +56,27 @@ const Notes = () => {
     return dayCount;
   };
 
+  const sortByDueDateFn = (tasks) => {
+    return [...tasks].sort((a, b) => {
+      // Handle cases where duedate is null
+      if (!a.duedate) return 1;
+      if (!b.duedate) return -1;
+      
+      // Compare the dates directly since they're already Date objects
+      return b.duedate - a.duedate;
+    });
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('userEmail');
     localStorage.removeItem('isAdmin');
     navigate('/login', { replace: true });
   };
-  
+
+  const handleDueDateClick = () => {
+    setSortByDueDate(prev => !prev);
+  };
+
   const handlePasswordUpdate = async (currentPassword, newPassword) => {
     try {
       const email = localStorage.getItem('userEmail');
@@ -72,7 +84,6 @@ const Notes = () => {
         throw new Error('User email not found in localStorage');
       }
   
-      // Find user by email
       const response = await db.userdetails.list([
         Query.equal('email', email)
       ]);
@@ -83,12 +94,10 @@ const Notes = () => {
   
       const user = response.documents[0];
       
-      // Verify current password
       if (user.password !== currentPassword) {
         throw new Error('Current password is incorrect');
       }
   
-      // Update password
       await db.userdetails.update(user.$id, {
         password: newPassword
       });
@@ -111,12 +120,13 @@ const Notes = () => {
       return updatedNotes;
     });
   };
+
   React.useEffect(() => {
-     const interval = setInterval(() => {
-       setIsAnimating(prev => !prev);
-     }, 1500);
-     return () => clearInterval(interval);
-   }, []);
+    const interval = setInterval(() => {
+      setIsAnimating(prev => !prev);
+    }, 1500);
+    return () => clearInterval(interval);
+  }, []);
 
   const filteredNotes = useMemo(() => {
     if (!Array.isArray(notes)) return [];
@@ -135,18 +145,15 @@ const Notes = () => {
     return activeFiltered;
   }, [notes, filterOption, selectedOwner]);
 
-  // Inside your Notes component
-
   const sortedFilteredNotes = useMemo(() => {
-    // Add additional safety checks
     if (!filteredNotes || !Array.isArray(filteredNotes)) {
       console.error("Invalid filteredNotes:", filteredNotes);
       return [];
     }
-
-    const sortedNotes = SortTasks(filteredNotes);
-    return sortedNotes || []; // Ensure always returning an array
-  }, [filteredNotes]);
+    return sortByDueDate 
+      ? sortByDueDateFn(filteredNotes)
+      : SortTasks(filteredNotes) || [];
+  }, [filteredNotes, sortByDueDate]);
 
   const refreshTasks = async (reason = "general") => {
     setLoading(true);
@@ -159,7 +166,6 @@ const Notes = () => {
 
       let allDocuments = response.documents;
 
-      // Fetch all pages of data
       while (response.total > allDocuments.length) {
         response = await db.todocollection.list([
           Query.limit(limitPerPage),
@@ -169,7 +175,6 @@ const Notes = () => {
         allDocuments = [...allDocuments, ...response.documents];
       }
 
-      // Deduplicate tasks by their $id
       const tasks = Array.isArray(allDocuments)
         ? Array.from(
             new Map(
@@ -201,12 +206,10 @@ const Notes = () => {
     }
   };
 
-  // On initial mount, do an initial fetch with reason "mount"
   useEffect(() => {
     refreshTasks("mount");
   }, []);
 
-  // Whenever theme changes, store it in local storage
   useEffect(() => {
     localStorage.setItem("theme", theme);
   }, [theme]);
@@ -218,11 +221,7 @@ const Notes = () => {
     }
   }, [notes]);
 
-  // NEW: Log "notes changed" whenever the 'notes' state updates
-
-  // In Notes.js:
   const handleSaveTask = (updatedDoc) => {
-    //////console.log("handleSaveTask => got updated doc:", updatedDoc);
     setNotes((prevNotes) => {
       const updatedNotes = prevNotes.map((note) =>
         note.$id === updatedDoc.$id ? { ...note, ...updatedDoc } : note
@@ -293,11 +292,9 @@ const Notes = () => {
   }
 
   return (
-    <div
-      className={`flex flex-col min-h-screen ${getContainerClass()} ${selectedFont}`}
-    >
+    <div className={`flex flex-col min-h-screen ${getContainerClass()} ${selectedFont}`}>
       <div className="fixed top-0 left-0 right-0 bg-opacity-90 z-10 bg-inherit shadow-md">
-        <div className="container mx-auto items-center justify-between mb-1 ">
+        <div className="container mx-auto items-center justify-between mb-1">
           <div className="flex items-center space-x-6">
             <ThemeChanger currentTheme={theme} setTheme={setTheme} isAdmin={isAdmin}/>
             <FontChanger
@@ -307,42 +304,37 @@ const Notes = () => {
             />
             <h1 className="text-3xl flex-1 text-center">
               TaskForce{" "}
-              <span
-                 className={`inline-block text-2xl ${isAnimating ? 'opacity-100' : 'opacity-50'} transition-opacity duration-500`}>
-              
+              <span className={`inline-block text-2xl ${isAnimating ? 'opacity-100' : 'opacity-50'} transition-opacity duration-500`}>
                 ⚡
               </span>
             </h1>
             <span className="flex items-center space-x-1">
-                  <FilterView
-                    theme={theme}
-                    selectedFont={selectedFont}
-                    setSelectedFont={setSelectedFont}
-                    filterOption={filterOption}
-                    setFilterOption={setFilterOption}
-                    onOwnerChange={(owner) => setSelectedOwner(owner)}
-                  />
-                  <button
-                    className={`p-2 rounded-lg hover:bg-opacity-80 transition-colors ${
-                      theme === 'dark' 
-                        ? 'hover:bg-gray-700 text-gray-300' 
-                        : theme === 'green'
-                        ? 'hover:bg-cyan-700 text-gray-300'
-                        : 'hover:bg-gray-200 text-gray-600'
-                    }`}
-                    onClick={() => setIsSettingsModalOpen(true)}
-                  >
-                    ⚙️
-                  </button>
-              </span>
-                          
+              <FilterView
+                theme={theme}
+                selectedFont={selectedFont}
+                setSelectedFont={setSelectedFont}
+                filterOption={filterOption}
+                setFilterOption={setFilterOption}
+                onOwnerChange={(owner) => setSelectedOwner(owner)}
+              />
+              <button
+                className={`p-2 rounded-lg hover:bg-opacity-80 transition-colors ${
+                  theme === 'dark' 
+                    ? 'hover:bg-gray-700 text-gray-300' 
+                    : theme === 'green'
+                    ? 'hover:bg-cyan-700 text-gray-300'
+                    : 'hover:bg-gray-200 text-gray-600'
+                }`}
+                onClick={() => setIsSettingsModalOpen(true)}
+              >
+                ⚙️
+              </button>
+            </span>
 
-            <span
-              className={`ml-4 text-sm border border-gray-300 rounded-full px-4 py-1  ${
-                textColorByTheme[theme] || "text-gray-500"
-              }`}
-            >
-             {filteredCount} Tasks
+            <span className={`ml-4 text-sm border border-gray-300 rounded-full px-4 py-1 ${
+              textColorByTheme[theme] || "text-gray-500"
+            }`}>
+              {filteredCount} Tasks
             </span>
 
             <span
@@ -359,9 +351,13 @@ const Notes = () => {
             inputClass={getInputClass()}
             theme={theme}
             selectedFont={selectedFont}
-            refreshTasks={refreshTasks} // Pass refreshTasks as a prop
+            refreshTasks={refreshTasks}
           />
-          <TaskHeader theme={theme} />
+          <TaskHeader 
+            theme={theme} 
+            onDueDateClick={handleDueDateClick}
+            isSortingByDueDate={sortByDueDate}
+          />
         </div>
       </div>
 
@@ -382,11 +378,10 @@ const Notes = () => {
                 onSaveTask={handleSaveTask}
                 onEdit={handleEdit}
                 setTotalTasks={setTotalTasks}
-                isAdmin={isAdmin} // A
+                isAdmin={isAdmin}
               />
             </div>
           ))}
-         
 
         {isEditing && taskToEdit && (
           <EditTask
@@ -396,19 +391,19 @@ const Notes = () => {
             theme={theme}
           />
         )}
-         <AdminSettingsModal
-  isOpen={isSettingsModalOpen}
-  onClose={() => setIsSettingsModalOpen(false)}
-  onLogout={handleLogout}
-  onPasswordUpdate={handlePasswordUpdate}
-  theme={theme}
-  userTasks={notes}/>
+        
+        <AdminSettingsModal
+          isOpen={isSettingsModalOpen}
+          onClose={() => setIsSettingsModalOpen(false)}
+          onLogout={handleLogout}
+          onPasswordUpdate={handlePasswordUpdate}
+          theme={theme}
+          userTasks={notes}
+        />
       </div>
 
       <Footer theme={theme} />
     </div>
-
-    
   );
 };
 

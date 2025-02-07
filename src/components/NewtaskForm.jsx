@@ -6,7 +6,8 @@ import { FaCalendarAlt } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import PropTypes from 'prop-types';
- 
+
+
 
 // Function to manage calendar colors based on theme
 const getCalendarColors = (theme) => {
@@ -27,7 +28,7 @@ const getCalendarColors = (theme) => {
         border: 'border-gray-600',
         selectedDateBg: 'bg-indigo-500',
         selectedDateText: 'text-gray-100',
-        buttonBg: 'bg-gray-600 hover:bg-gray-700 text-white',
+        buttonBg: 'bg-gray-100 hover:bg-gray-700 text-black',
       };
     case 'green':
       return {
@@ -62,6 +63,10 @@ function NewtaskForm({ addTask, inputClass, theme, selectedFont }) {
   const [highlightCalendarIcon, setHighlightCalendarIcon] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [documentLink, setDocumentLink] = useState("");
+const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
+const [hasDocument, setHasDocument] = useState(false);
+ 
 
   // Get colors based on the current theme
   const calendarColors = getCalendarColors(theme);
@@ -90,6 +95,14 @@ function NewtaskForm({ addTask, inputClass, theme, selectedFont }) {
     light: "bg-gray-600 hover:bg-gray-900 text-white",
     dark: "bg-white hover:bg-gray-400 text-black",
     green: "bg-teal-700 hover:bg-teal-600 text-teal-100",
+  };
+
+  const handleDocumentSubmit = (e) => {
+    e.preventDefault();
+    if (documentLink.trim()) {
+      setHasDocument(true);
+    }
+    setIsDocumentModalOpen(false);
   };
 
   const openCalendar = () => setCalendarOpen(true);
@@ -168,6 +181,7 @@ function NewtaskForm({ addTask, inputClass, theme, selectedFont }) {
         taskowner: taskOwner,
         taskownerinitials: tskini,
         completed: false,
+        doclink: documentLink || null, // Add this line
         duedate: selectedDate ? 
     selectedDate.toLocaleDateString('en-CA') // This formats as YYYY-MM-DD
     : null,
@@ -191,6 +205,8 @@ function NewtaskForm({ addTask, inputClass, theme, selectedFont }) {
         formRef.current.reset();
         setIsCritical(false);
         setSelectedTaskOwner("TaskOwner?");
+        setDocumentLink(""); // Add this line
+        setHasDocument(false); // Add this line
        
         setError(null);
         setSelectedDate(null); // Reset the selected date
@@ -225,10 +241,77 @@ function NewtaskForm({ addTask, inputClass, theme, selectedFont }) {
           tabIndex="1" // Set tabIndex to 1 for task name input
         />
 
+
+
+            {/* Document Link Icon */}
+            <div
+              onClick={() => setIsDocumentModalOpen(true)}
+              className={`cursor-pointer mx-2 p-2 rounded-full transition-all duration-200 ${
+                hasDocument 
+                  ? 'border-double border border-gray-400-50 text-blue-500' 
+                  : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
+              title={hasDocument ? "Document attached" : "Add document link"}
+            >
+              <span className="text-xl">🔗</span>
+            </div>
+
+           {/* Document Link Modal */}
+{isDocumentModalOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className={`p-6 rounded-lg shadow-lg max-w-md w-full ${calendarColors.bg} ${calendarColors.text}`}>
+      <h2 className={`font-bold mb-4 text-center ${calendarColors.text}`}>
+        Document Link for this task
+      </h2>
+      
+      <div> {/* Changed from form to div */}
+        <input
+          type="text"
+          value={documentLink}
+          onChange={(e) => setDocumentLink(e.target.value)}
+          placeholder="Paste document link here"
+          className={`w-full p-2 mb-4 rounded-md border text-sm ${calendarColors.border} ${calendarColors.bg} ${calendarColors.text}`}
+        />
+        
+        <div className="flex justify-center space-x-4">
+          <button
+            type="button"  
+            onClick={() => {
+              if (documentLink.trim()) {
+                setHasDocument(true);
+                setIsDocumentModalOpen(false);
+              }
+            }}
+            className={`px-4 py-2 rounded-md ${calendarColors.buttonBg}`}
+          >
+            Add 
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsDocumentModalOpen(false)}
+            className="px-4 py-2 rounded-md bg-gray-500 text-white hover:bg-gray-600"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
+
+
+
+
         {/* Calendar Icon with Conditional Border */}
         <FaCalendarAlt
           onClick={openCalendar}
-          className={`cursor-pointer text-xl mx-2 ${
+          className={`cursor-pointer text-xl 
+        
+            mx-2 ${
             highlightCalendarIcon ? "text-orange-500" : ""
           }`}
           title="Open Calendar"

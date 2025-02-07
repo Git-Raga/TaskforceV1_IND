@@ -30,11 +30,13 @@ function Tasks({ taskData, setNotes, theme, selectedFont, triggerHeaderTickAnima
     taskownerinitials: getInitials(taskData.taskowner || "Unassigned"),
     starred: taskData.Perfectstar || false,
     duedate: taskData.duedate || "NA", // Set "NA" if duedate is null or not set
+    doclink:taskData.doclink
   });
   
   const [taskAge, setTaskAge] = useState(0);  
   const [animateStar, setAnimateStar] = useState(false);
   const [animateRow, setAnimateRow] = useState(false);
+  const [isDocLinkModalOpen, setIsDocLinkModalOpen] = useState(false);
 
   useEffect(() => {
     if (taskData.$createdAt) {
@@ -200,6 +202,8 @@ const handleStarToggle = async () => {
     }
   };
 
+
+
   const getBackgroundColor = (initials) => {
     const colorMap = {
       AM: "bg-red-500",
@@ -251,16 +255,31 @@ const handleStarToggle = async () => {
       </span>
     )}
  
-
+<span
+  style={{
+    display: "inline-block",
+    width: "30px",
+    whiteSpace: "nowrap",
+    textIndent: "15px",
+    textAlign: "center",
+    cursor: taskData.doclink ? "pointer" : "default"
+  }}
+  onClick={() => taskData.doclink && setIsDocLinkModalOpen(true)}
+  title={taskData.doclink || ""}
+  className={taskData.doclink ? "hover:scale-110 transition-transform" : ""}
+>
+  {taskData.doclink ? "📎" : ""}
+</span>
+        
 
  <span
   className={`${completed ? "line-through" : ""}`}
   style={{
     display: "inline-block", // Ensures it's treated like a block for proper alignment
-    width: "500px", // Fixed width for alignment
+    width: "700px", // Fixed width for alignment
     overflow: "hidden", // Optional: handles text overflow if necessary
     whiteSpace: "nowrap", // Optional: prevents text wrapping
-    textIndent: "20px",
+    textIndent: "35px",
     textAlign:"left"
   }}
 >
@@ -356,6 +375,62 @@ const handleStarToggle = async () => {
  
  
         </div>
+
+
+ {/* Document Link Modal */}
+{isDocLinkModalOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className={`p-6 rounded-lg shadow-lg max-w-md w-full ${
+      theme === 'dark' 
+        ? 'bg-gray-800 text-white' 
+        : theme === 'green'
+        ? 'bg-cyan-900 text-white'
+        : 'bg-white text-gray-800'
+    }`}>
+      <h2 className="text-xl font-bold mb-4 text-center">
+        Document Link
+      </h2>
+      
+      <div className={`mb-4 p-3 rounded-md break-all ${
+        theme === 'dark'
+          ? 'bg-gray-700'
+          : theme === 'green'
+          ? 'bg-cyan-800'
+          : 'bg-gray-100'
+      }`}>
+        <a 
+          href={taskData.doclink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`hover:underline ${
+            theme === 'dark' || theme === 'green'
+              ? 'text-blue-300 hover:text-blue-400'
+              : 'text-blue-600 hover:text-blue-700'
+          }`}
+        >
+          {taskData.doclink}
+        </a>
+      </div>
+      
+      <div className="flex justify-center space-x-4">
+        <button
+          onClick={() => setIsDocLinkModalOpen(false)}
+          className={`px-4 py-2 rounded transition-colors ${
+            theme === 'dark'
+              ? 'bg-gray-600 hover:bg-gray-700 text-white'
+              : theme === 'green'
+              ? 'bg-teal-700 hover:bg-teal-800 text-white'
+              : 'bg-gray-500 hover:bg-gray-600 text-white'
+          }`}
+        >
+          ❎
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
       </div>
     </div>
   );

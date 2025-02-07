@@ -225,13 +225,13 @@ const SupportPage = () => {
     <table className={` ${themeClasses.tableBg}`}>
     
     <colgroup>
-        <col style={{ width: '5%' }} />
-        <col style={{ width: '35%' }} />
-        <col style={{ width: '35%' }} />
-        <col style={{ width: '10%' }} />
-        <col style={{ width: '10%' }} />
-        <col style={{ width: '12%' }} />
+        <col style={{ width: '1%' }} />
         <col style={{ width: '20%' }} />
+        <col style={{ width: '20%' }} />
+        <col style={{ width: '5%' }} />
+        <col style={{ width: '2%' }} />
+        <col style={{ width: '2%' }} />
+        <col style={{ width: '40%' }} />
       </colgroup>
  
       <thead className={themeClasses.tableHeaderBg}>
@@ -257,7 +257,7 @@ const SupportPage = () => {
             <td className="px-4 py-2">{ticket.urgency}</td>
             <td className="px-4 py-2">{ticket.reportedby}</td>
             <td className="px-4 py-2">{ticket.status}</td>
-            <td className="px-4 py-2">{ticket.developerComments}</td>
+            <td className="px-4 py-2">{ticket.developercomments}</td>
           </tr>
                         ))}
                     </tbody>
