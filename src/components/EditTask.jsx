@@ -13,6 +13,8 @@ function EditTask({
   const [taskName, setTaskName] = useState(task.taskname || "");
   const [isCritical, setIsCritical] = useState(task.criticaltask || false);
   const [taskOwner, setTaskOwner] = useState(task.taskowner || "Unassigned");
+  const [hasDocLink, setHasDocLink] = useState(!!task.doclink);
+const [docLink, setDocLink] = useState(task.doclink || "");
   
   const [duedate, setDuedate] = useState(() => {
     if (!task.duedate || task.duedate === "NA") return null;
@@ -47,6 +49,7 @@ function EditTask({
       taskowner: taskOwner,
       duedate: duedate ? duedate.toISOString() : null,
       Perfectstar: isStarred,
+      doclink: hasDocLink ? docLink : null,
     };
   
     console.log("Saving updated fields:", updatedFields);
@@ -153,6 +156,48 @@ function EditTask({
           placeholderText="Select a date"
           className={`w-full p-2 rounded-md mb-4 border border-gray-300 ${styles.dueDateBg} ${styles.dueDateText}`}
         />
+        {/* Document Link Section */}
+<div className="mb-4 text-black" >
+  <label className={`${styles.text} block mb-2`}>Document Link:</label>
+  <div className="flex items-center space-x-4">
+    <label className="inline-flex items-center">
+      <input
+        type="radio"
+        name="hasDocLink"
+        checked={hasDocLink}
+        onChange={() => setHasDocLink(true)}
+        className="form-radio mr-2"
+      />
+      <span>Yes</span>
+    </label>
+    <label className="inline-flex items-center">
+      <input
+        type="radio"
+        name="hasDocLink"
+        checked={!hasDocLink}
+        onChange={() => {
+          setHasDocLink(false);
+          setDocLink("");
+        }}
+        className="form-radio mr-2"
+      />
+      <span>No</span>
+    </label>
+  </div>
+
+  {/* Document Link Input - Only show if Yes is selected */}
+  {hasDocLink && (
+    <div className="mt-2">
+      <input
+        type="text"
+        value={docLink}
+        onChange={(e) => setDocLink(e.target.value)}
+        placeholder="Enter document link"
+        className={`w-full p-2 rounded-md border ${styles.dropdownBg}`}
+      />
+    </div>
+  )}
+</div>
 
         {/* Save & Cancel Buttons */}
         <div className="flex justify-end space-x-2">

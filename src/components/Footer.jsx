@@ -50,7 +50,7 @@ function Footer({ theme }) {
           <span className="text-sm font-bold">Support</span>
         </div>
 
-        <div className="text-sm ml-auto font-titillium">Ver | 2.0</div>
+        <div className="text-sm ml-auto font-titillium">Ver | 3.0</div>
       </div>
     </footer>
   );

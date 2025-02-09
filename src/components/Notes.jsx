@@ -63,7 +63,7 @@ const Notes = () => {
       if (!b.duedate) return -1;
       
       // Compare the dates directly since they're already Date objects
-      return b.duedate - a.duedate;
+      return a.duedate - b.duedate;
     });
   };
 

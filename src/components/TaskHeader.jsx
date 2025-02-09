@@ -44,17 +44,17 @@ function TaskHeader({ theme, onDueDateClick, isSortingByDueDate }) {
     >
       <div className={`flex items-center text-sm font-semibold ${themeTextColor}`}>
         {/* Urgency */}
-        <span className="flex-none w-[100px] text-left ml-1 flex items-center">
+        <span className="flex-none w-[100px] text-left ml-10 flex items-center">
           Urgency ❗
         </span>
 
   {/* Task Details */}
-  <span className="flex-grow ml-16 flex items-center  ">
-  📄
+  <span className="flex-grow ml-6 flex items-center  ">
+  📜
         </span>
 
         {/* Task Details */}
-        <span className="flex-grow mr-[580px] flex items-center w-[150px]">
+        <span className="flex-grow  ml-5 flex items-center ">
           Task Details 📝
         </span>
 

@@ -231,7 +231,7 @@ const handleStarToggle = async () => {
  }`}
 >
 
-  <div className="flex justify-between items-center">
+  <div className="flex justify-between items-center ">
   {/* Left side: CRITICAL-LATE or NORMAL-LATE badges */}
   <div className="flex items-center text-center flex-1">
   {latetask(taskData.duedate) ? (
@@ -262,7 +262,8 @@ const handleStarToggle = async () => {
     whiteSpace: "nowrap",
     textIndent: "15px",
     textAlign: "center",
-    cursor: taskData.doclink ? "pointer" : "default"
+    cursor: taskData.doclink ? "pointer" : "default",
+    minWidth: "30px" 
   }}
   onClick={() => taskData.doclink && setIsDocLinkModalOpen(true)}
   title={taskData.doclink || ""}
@@ -273,15 +274,18 @@ const handleStarToggle = async () => {
         
 
  <span
-  className={`${completed ? "line-through" : ""}`}
+  className={`${completed ? "line-through" : ""} ml-4`}
+  
   style={{
-    display: "inline-block", // Ensures it's treated like a block for proper alignment
-    width: "700px", // Fixed width for alignment
-    overflow: "hidden", // Optional: handles text overflow if necessary
-    whiteSpace: "nowrap", // Optional: prevents text wrapping
-    textIndent: "35px",
-    textAlign:"left"
-  }}
+      display: "inline-block",
+      flex: "1",
+      overflow: "hidden",
+      textAlign:"left",
+      textOverflow: "ellipsis",
+      paddingRight: "5px", // Buffer space before due date
+      minWidth: "0", // Important for text truncation
+    }}
+   
 >
   {taskData.taskname}
 </span>
